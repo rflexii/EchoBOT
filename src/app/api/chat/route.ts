@@ -84,6 +84,18 @@ async function appendActivityLog(values: typeof activityLogs.$inferInsert) {
 // ── POST /api/chat ───────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  try {
+    return await handleChat(req);
+  } catch (e) {
+    console.error("[api/chat] unhandled error:", e);
+    return NextResponse.json(
+      { error: "Internal server error", escalated: true },
+      { status: 500 }
+    );
+  }
+}
+
+async function handleChat(req: NextRequest) {
   let body: z.infer<typeof chatSchema>;
   try {
     body = chatSchema.parse(await req.json());
