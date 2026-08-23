@@ -1,0 +1,10 @@
+node_modules
+.next
+.env
+.env.local
+.vercel
+*.log
+dist
+.DS_Store
+*.zip
+!drizzle
