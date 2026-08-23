@@ -137,11 +137,6 @@
       return el;
     }
 
-    function removeTyping() {
-      var t = msgsEl.querySelector("div");
-      // typing indicator is the only child with spans; remove it if present
-    }
-
     launcher.addEventListener("click", function () { setOpen(!open); });
 
     async function send() {
