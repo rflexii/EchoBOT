@@ -7,15 +7,27 @@ export default function ConversationDetailPage({ params }: { params: { id: strin
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!params?.id) { setError("not found"); return; }
+    if (!params?.id) { setError("No id"); return; }
     fetch(`/api/admin/conversations/${params.id}`)
-      .then(async (r) => { const d = await r.json(); if (!r.ok) throw new Error(d.error || "not found"); return d; })
-      .then((d) => { if (!d.conversation) throw new Error("not found"); setData(d.conversation); })
-      .catch((e) => setError(e.message === "not found" ? "not found" : "Failed to load"));
+      .then(async (r) => {
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || "Failed to load");
+        return d;
+      })
+      .then((d) => {
+        if (!d.conversation) throw new Error("Not found");
+        setData(d.conversation);
+      })
+      .catch((e) => setError(e.message || "Failed to load"));
   }, [params?.id]);
 
   if (error) {
-    return (<div className="py-20 text-center text-sm text-slate-500">{error === "not found" ? <div>Conversation not found. <Link href="/admin/conversations" className="text-brand-600 underline">Back</Link></div> : error}</div>);
+    return (
+      <div className="py-20 text-center text-sm text-slate-500">
+        <div className="font-medium text-red-600">{error}</div>
+        <Link href="/admin/conversations" className="mt-2 inline-block text-brand-600 underline">Back to conversations</Link>
+      </div>
+    );
   }
   if (!data) return <div className="py-20 text-center text-sm text-slate-400">Loading…</div>;
 
