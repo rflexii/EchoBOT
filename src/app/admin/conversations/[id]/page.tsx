@@ -2,20 +2,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-export default function ConversationDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const [id, setId] = useState<string | null>(null);
+export default function ConversationDetailPage({ params }: { params: { id: string } }) {
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => { params.then((p) => setId(p.id)); }, [params]);
-
   useEffect(() => {
-    if (!id) return;
-    fetch(`/api/admin/conversations/${id}`)
+    if (!params?.id) return;
+    fetch(`/api/admin/conversations/${params.id}`)
       .then((r) => { if (r.status === 401) throw new Error("unauthorized"); if (!r.ok) throw new Error("not found"); return r.json(); })
       .then((d) => { if (!d.conversation) throw new Error("not found"); setData(d.conversation); })
       .catch((e) => setError(e.message === "unauthorized" ? "unauthorized" : "not found"));
-  }, [id]);
+  }, [params?.id]);
 
   if (error) {
     return (<div className="py-20 text-center text-sm text-slate-500">{error === "unauthorized" ? <Link href="/admin/login" className="text-brand-600 underline">Sign in</Link> : <div>Conversation not found. <Link href="/admin/conversations" className="text-brand-600 underline">Back</Link></div>}</div>);
