@@ -1,11 +1,3 @@
-/**
- * Echo Systems knowledge base.
- *
- * This is the structured info Ramat uses to answer visitor questions.
- * Update this file as services/pricing change — it is injected into the
- * system prompt on every conversation.
- */
-
 export interface Service {
   id: string;
   name: string;
@@ -19,122 +11,160 @@ export interface Service {
 
 export const SERVICES: Service[] = [
   {
-    id: "web-development",
-    name: "Web Design & Development",
-    tagline: "Modern, fast, conversion-focused websites",
-    description:
-      "Custom websites and web applications built for performance, accessibility, and business results. From marketing sites to complex client portals.",
+    id: "tax-management",
+    name: "Tax Management",
+    tagline: "Streamline tax processes and ensure compliance",
+    description: "Comprehensive tax management solutions designed to streamline your tax processes, ensure regulatory compliance, and optimize tax operations for businesses and government agencies.",
     features: [
-      "Custom UI/UX design",
-      "Responsive (mobile-first) development",
-      "SEO foundations & performance optimization",
-      "CMS integration (headless or traditional)",
-      "E-commerce & payment integration",
-      "Ongoing maintenance & support",
+      "Automated tax calculation and filing",
+      "Real-time tax reporting and analytics",
+      "Multi-jurisdiction tax compliance",
+      "Integration with existing financial systems",
+      "Audit trail and documentation management",
     ],
-    deliverables: ["Design mockups", "Staging site", "Production launch", "Documentation"],
-    typicalTimeline: "2–8 weeks depending on scope",
+    deliverables: ["Tax assessment system", "Filing platform", "Compliance dashboard", "Training"],
+    typicalTimeline: "4–12 weeks depending on scope",
   },
   {
-    id: "software-development",
-    name: "Custom Software Development",
-    tagline: "Tailored software that fits your business",
-    description:
-      "End-to-end software solutions — from internal tools and automation to customer-facing platforms — designed around your workflows.",
+    id: "payment-gateway",
+    name: "Payment Gateway",
+    tagline: "Secure and reliable payment processing",
+    description: "Secure, reliable, and seamless payment processing solutions that enable businesses to accept payments across multiple channels with robust fraud protection.",
     features: [
-      "Business process analysis",
-      "Architecture & system design",
-      "Full-stack development",
-      "API design & third-party integrations",
-      "Testing, QA & deployment",
+      "Multi-card and bank transfer support",
+      "Mobile money integration",
+      "Real-time transaction monitoring",
+      "PCI-DSS compliant infrastructure",
+      "Settlement and reconciliation automation",
     ],
-    deliverables: ["Technical specification", "Iterative demos", "Source code", "Deployment"],
+    deliverables: ["Payment platform", "Merchant dashboard", "Integration API", "Documentation"],
+    typicalTimeline: "6–16 weeks",
   },
   {
-    id: "network-infrastructure",
-    name: "Network Infrastructure & Security",
-    tagline: "Secure, reliable networks for growing businesses",
-    description:
-      "Design, deployment and management of enterprise-grade networks, cybersecurity, and surveillance infrastructure.",
+    id: "revenue-management",
+    name: "Revenue Management",
+    tagline: "Optimise and maximise revenue collections",
+    description: "Advanced revenue management systems for governments and large organisations to optimise and maximise revenue collections across all sectors.",
     features: [
-      "LAN/WAN design & setup",
-      "Firewall & cybersecurity",
-      "CCTV & access control systems",
-      "Structured cabling",
-      "Network monitoring & maintenance",
+      "Revenue tracking and analytics",
+      "Automated billing and invoicing",
+      "Multi-channel payment collection",
+      "Reporting and forecasting dashboards",
+      "Integration with tax and treasury systems",
     ],
-    deliverables: ["Site survey", "Network diagram", "Installation", "Handover & training"],
+    deliverables: ["Revenue platform", "Analytics dashboard", "Integration layer", "Training"],
+    typicalTimeline: "8–20 weeks",
   },
   {
-    id: "cloud-services",
-    name: "Cloud Services & DevOps",
-    tagline: "Scale confidently on the cloud",
-    description:
-      "Cloud migration, infrastructure management, and DevOps practices so your systems stay available, secure, and cost-efficient.",
+    id: "core-banking",
+    name: "Core Banking Solutions",
+    tagline: "Robust platforms for modern financial institutions",
+    description: "Robust, scalable core banking platforms designed for modern financial institutions to manage accounts, transactions, lending, and customer relationships.",
     features: [
-      "Cloud migration (AWS, Azure, GCP)",
-      "Infrastructure-as-Code",
-      "CI/CD pipelines",
-      "Monitoring, alerting & incident response",
-      "Cost optimization",
+      "Account management (savings, current, fixed deposit)",
+      "Loan and credit management",
+      "Real-time transaction processing",
+      "Customer relationship management (CRM)",
+      "Regulatory reporting and compliance",
     ],
-    deliverables: ["Migration plan", "Infrastructure setup", "Runbook", "Knowledge transfer"],
+    deliverables: ["Core banking platform", "Admin dashboard", "Mobile banking app", "API integration"],
+    typicalTimeline: "12–36 weeks",
   },
   {
-    id: "erp-pos",
-    name: "ERP & POS Solutions",
-    tagline: "Run your operations on one connected system",
-    description:
-      "Enterprise resource planning and point-of-sale systems that unify sales, inventory, accounting, and reporting.",
+    id: "financial-inclusion",
+    name: "Financial Inclusion",
+    tagline: "Promoting access through innovative technology",
+    description: "Promoting financial access and inclusion through innovative technology solutions that bring banking and financial services to underserved communities.",
     features: [
-      "Inventory & warehouse management",
-      "Sales & invoicing",
-      "Accounting & financial reporting",
-      "Multi-branch support",
-      "Hardware supply (POS terminals, printers, scanners)",
+      "Agent banking platforms",
+      "Microfinance management",
+      "Mobile wallet solutions",
+      "KYC and identity verification",
+      "Financial literacy tools",
     ],
-    deliverables: ["Requirements workshop", "Configured system", "Data migration", "Training"],
+    deliverables: ["Inclusion platform", "Mobile wallet", "Agent management system", "Training"],
+    typicalTimeline: "8–20 weeks",
   },
   {
-    id: "it-support",
-    name: "IT Support & Maintenance",
-    tagline: "Downtime is not an option",
-    description:
-      "Proactive IT support and managed services to keep your business running — helpdesk, on-site visits, and SLAs.",
+    id: "web-mobile",
+    name: "Web & Mobile Applications",
+    tagline: "Custom development for your business needs",
+    description: "Custom web and mobile application development tailored to your business needs, from customer-facing portals to internal management tools.",
     features: [
-      "Helpdesk (remote & on-site)",
-      "Managed IT services & SLAs",
-      "Hardware procurement & setup",
-      "Software licensing & compliance",
-      "Backup & disaster recovery",
+      "Responsive web applications",
+      "Native and cross-platform mobile apps",
+      "Progressive web apps (PWA)",
+      "UI/UX design and prototyping",
+      "Ongoing maintenance and support",
     ],
-    deliverables: ["Support plan", "SLA agreement", "Monthly reporting"],
+    deliverables: ["Web application", "Mobile app", "Design system", "Documentation"],
+    typicalTimeline: "4–16 weeks",
   },
   {
-    id: "digital-marketing",
-    name: "Digital Marketing & Branding",
-    tagline: "Get found. Get chosen.",
-    description:
-      "Brand identity, digital marketing, and growth strategies that turn visibility into leads and revenue.",
+    id: "erestaurant",
+    name: "eRestaurant.ng",
+    tagline: "Comprehensive restaurant management",
+    description: "Comprehensive restaurant management system to streamline operations, manage orders, inventory, and enhance customer experience.",
     features: [
-      "Brand identity & design",
-      "Social media management",
-      "Search engine marketing (SEM/PPC)",
-      "Content strategy & creation",
-      "Analytics & reporting",
+      "Order and table management",
+      "Inventory and stock tracking",
+      "Menu management",
+      "Customer loyalty programs",
+      "Sales analytics and reporting",
     ],
-    deliverables: ["Brand guide", "Campaign assets", "Monthly analytics report"],
+    deliverables: ["Restaurant platform", "POS integration", "Customer app", "Admin dashboard"],
+    typicalTimeline: "4–10 weeks",
+  },
+  {
+    id: "ejudiciary",
+    name: "eJudiciary.ng",
+    tagline: "Digital transformation for judicial systems",
+    description: "Digital transformation solution for judicial systems with efficient case management, document management, and court administration.",
+    features: [
+      "Case management and tracking",
+      "Digital document management",
+      "Court scheduling and calendar",
+      "Automated notifications",
+      "Judgment and order management",
+    ],
+    deliverables: ["Judiciary platform", "Case database", "Document system", "Training"],
+    typicalTimeline: "8–20 weeks",
+  },
+  {
+    id: "systems-automation",
+    name: "Systems Automation",
+    tagline: "End-to-end business process automation",
+    description: "Custom end-to-end business process automation to streamline operations, reduce manual effort, and improve organisational efficiency.",
+    features: [
+      "Process mapping and analysis",
+      "Workflow automation",
+      "Integration of disparate systems",
+      "Robotic process automation (RPA)",
+      "Monitoring and reporting dashboards",
+    ],
+    deliverables: ["Automated workflows", "Integration layer", "Monitoring dashboard", "Documentation"],
+    typicalTimeline: "6–16 weeks",
   },
 ];
 
 export const COMPANY_INFO = {
-  name: "Echo Systems",
+  name: "Echo Systems Network Ltd.",
   website: "https://echosystems.ng",
-  tagline: "Technology solutions that power your business",
-  description:
-    "Echo Systems is a Nigerian technology company providing end-to-end IT solutions for businesses and organizations — from web development and custom software to network infrastructure, cloud services, ERP/POS, IT support, and digital marketing.",
-  approach:
-    "We begin by understanding the client's goals, then design and deliver a solution that fits — with transparent pricing, clear timelines, and ongoing support.",
+  tagline: "Leading Financial Technology Solutions",
+  description: "Echo Systems Network Ltd. is a Nigerian technology company empowering businesses with innovative fintech solutions for tax management, payments, revenue management, banking, and financial inclusion. Founded with a vision to drive digital transformation across Africa.",
+  mission: "To provide cutting-edge technological solutions that empower businesses to achieve their goals through innovation, reliability, and excellence.",
+  vision: "To be the leading provider of technology solutions in Africa, driving digital transformation and financial inclusion across the continent.",
+  whyChooseUs: [
+    "Industry-leading expertise in fintech solutions",
+    "Proven track record of successful implementations",
+    "Comprehensive support and maintenance",
+    "Custom solutions tailored to your needs",
+  ],
+  contact: {
+    abuja: "Plot 903 Tafawa Balewa Way, Garki, Abuja, Nigeria",
+    kwara: "16B Police Road, GRA, Ilorin, Kwara, Nigeria",
+  },
+  approach: "We begin by understanding the client's goals and constraints, then design and deliver a solution that fits — with transparent pricing, clear timelines, and ongoing support.",
   values: [
     "Client-first: solutions tailored to your real needs",
     "Quality: we build things that last",
@@ -154,27 +184,28 @@ export function buildKnowledgePrompt(): string {
   const servicesText = SERVICES.map((s) => {
     const features = s.features.map((f) => `    - ${f}`).join("\n");
     const deliverables = s.deliverables.map((d) => `    - ${d}`).join("\n");
-    return [
-      `### ${s.name} (${s.tagline})`,
-      s.description,
-      `Features:\n${features}`,
-      `Deliverables:\n${deliverables}`,
-      s.typicalTimeline ? `Typical timeline: ${s.typicalTimeline}` : null,
-      s.pricingNote ? `Pricing: ${s.pricingNote}` : null,
-    ]
-      .filter(Boolean)
-      .join("\n");
+    return [`### ${s.name} (${s.tagline})`, s.description, `Features:\n${features}`, `Deliverables:\n${deliverables}`, s.typicalTimeline ? `Typical timeline: ${s.typicalTimeline}` : null].filter(Boolean).join("\n");
   }).join("\n\n");
 
   const values = COMPANY_INFO.values.map((v) => `- ${v}`).join("\n");
   const process = COMPANY_INFO.process.join("\n");
+  const whyUs = COMPANY_INFO.whyChooseUs.map((w) => `- ${w}`).join("\n");
 
-  return `# Echo Systems — Company & Services Knowledge Base
+  return `# Echo Systems Network Ltd. — Company & Services Knowledge Base
 
-## About Echo Systems
+## About Echo Systems Network Ltd.
 ${COMPANY_INFO.description}
 Tagline: "${COMPANY_INFO.tagline}"
 Website: ${COMPANY_INFO.website}
+
+## Mission
+${COMPANY_INFO.mission}
+
+## Vision
+${COMPANY_INFO.vision}
+
+## Why Choose Us
+${whyUs}
 
 ## Our Approach
 ${COMPANY_INFO.approach}
@@ -190,32 +221,31 @@ ${servicesText}
 
 ## Pricing
 Pricing is scoped per project based on requirements. We provide detailed, transparent proposals after a discovery call. Visitors should be encouraged to book a free discovery call for an accurate quote rather than expecting fixed online prices.
+
+## Contact
+- Abuja Office: ${COMPANY_INFO.contact.abuja}
+- Kwara Office: ${COMPANY_INFO.contact.kwara}
+- Website: ${COMPANY_INFO.website}
 `;
 }
 
-export const SYSTEM_PROMPT = `You are Ramat, the AI customer-service and sales assistant for Echo Systems (https://echosystems.ng). You are helpful, concise, professional, and friendly with a touch of warmth.
+export const SYSTEM_PROMPT = `You are Ramat, the AI customer-service and sales assistant for Echo Systems Network Ltd. (https://echosystems.ng). You are knowledgeable, helpful, concise, professional, and friendly. You have deep knowledge about the company and its services.
 
 ## Your role
-- Greet visitors and help them find the information they need about Echo Systems' services.
+- Greet visitors warmly and help them find information about Echo Systems' services.
 - Qualify sales conversations naturally: ask about their needs, timeline, budget, and contact details when appropriate.
-- Explain services clearly, suggest relevant options, and guide visitors toward booking a discovery call.
-- **Create support tickets** when a visitor has a complex request, complaint, or needs human intervention. When you detect escalation intent, tell them you're creating a ticket and summarize the issue. Each ticket gets a unique tracking number.
+- Explain services clearly with specific features and deliverables.
+- **Create support tickets** when a visitor has a complex request, complaint, or needs human intervention. Tell them you're creating a ticket with a unique tracking number.
+- Provide accurate contact details: Abuja office at Plot 903 Tafawa Balewa Way, Garki, Abuja; Kwara office at 16B Police Road, GRA, Ilorin.
 
 ## Rules
-- Base your answers ONLY on the provided company knowledge. If you are unsure or the question is outside the knowledge base, say honestly that you don't have that information and OFFER to open a ticket so a senior executive can follow up.
-- Never invent prices, timelines, or capabilities not in the knowledge base. For pricing, guide them to a discovery call.
+- Base your answers ONLY on the provided company knowledge. Never invent information.
 - Keep responses concise (2-4 short paragraphs max). Use bullet points when listing things.
-- When a visitor has a complex, sensitive, or out-of-scope request, **create a support ticket**: say you'll escalate it to a senior executive who will reach out. Every ticket gets a unique tracking number for follow-up.
-- When relevant, capture the visitor's name, email, phone, and need — this helps the Echo Systems team follow up.
-- Be proactive but never pushy. Prioritize being genuinely helpful.
-- Always sign off subtly as "— Ramat, Echo Systems" only on your first message in a conversation, not every message.
+- When a visitor needs human intervention, create a support ticket and tell them a senior executive will follow up.
+- Capture the visitor's name, email, phone, and need — this helps the team follow up.
+- Be proactive but never pushy.
+- Sign off as "— Ramat, Echo Systems" only on your first message.
 
-## Ticket trigger phrases
-When the visitor uses any of these intents, create a support ticket:
-- "I want to speak to a human / a manager / someone in charge",
-- "This is too complex for a bot",
-- "I have a complaint",
-- "I need a custom quote / proposal",
-- "connect me with sales / an executive",
-- questions you genuinely cannot answer from the knowledge base.
+## Ticket triggers
+Create a support ticket when the visitor asks to speak to a human/manager, has a complaint, needs a custom quote, or asks something outside your knowledge base.
 `;
