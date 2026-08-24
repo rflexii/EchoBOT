@@ -5,21 +5,23 @@ import { formatDateTime } from "@/lib/utils";
 
 export default function TicketDetailPage({ params }: { params: { id: string } }) {
   const [ticket, setTicket] = useState<any>(null);
-  const [note, setNote] = useState("");
-  const [msg, setMsg] = useState<string|null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`/api/admin/tickets/${params.id}`).then(r => r.json()).then(d => setTicket(d.ticket)).catch(() => setMsg("Failed to load"));
-  }, [params.id]);
+    if (!params?.id) return;
+    fetch(`/api/admin/tickets/${params.id}`)
+      .then((r) => { if (!r.ok) throw new Error("not found"); return r.json(); })
+      .then((d) => setTicket(d.ticket))
+      .catch(() => setError("Failed to load"));
+  }, [params?.id]);
+
+  if (error) return <div className="py-20 text-center text-sm text-slate-500">{error}</div>;
+  if (!ticket) return <div className="py-20 text-center text-sm text-slate-400">Loading…</div>;
 
   async function updateStatus(status: string) {
-    setMsg(null);
     const r = await fetch(`/api/admin/tickets/${params.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
-    if (r.ok) { setTicket({ ...ticket, status }); setMsg("Updated"); } else { setMsg("Failed"); }
+    if (r.ok) setTicket({ ...ticket, status });
   }
-
-  if (msg && !ticket) return <div className="py-20 text-center text-sm text-slate-500">{msg}</div>;
-  if (!ticket) return <div className="py-20 text-center text-sm text-slate-400">Loading…</div>;
 
   return (
     <div className="space-y-6">
@@ -41,7 +43,6 @@ export default function TicketDetailPage({ params }: { params: { id: string } })
           {ticket.status === "in_progress" && <button onClick={() => updateStatus("resolved")} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white">Resolve</button>}
           {ticket.status !== "closed" && <button onClick={() => updateStatus("closed")} className="rounded-lg border border-slate-200 px-4 py-2 text-sm">Close</button>}
         </div>
-        {msg && <div className="mt-2 text-xs text-emerald-600">{msg}</div>}
       </div>
     </div>
   );

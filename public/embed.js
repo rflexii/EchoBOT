@@ -82,18 +82,19 @@
       var text = input.value.trim();
       if (!text) return;
 
-      // Capture name from message
-      if (!visitor.name) {
-        var patterns = [
-          /my name is\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
-          /i am\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
-          /i'm\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
-          /call me\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
-          /this is\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
-          /name[:\s]+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
-        ];
-        for (var p = 0; p < patterns.length; p++) { var m = text.match(patterns[p]); if (m) { visitor.name = m[1].trim(); break; } }
-      }
+// Capture name from EVERY message until we have it
+if (!visitor.name) {
+  var patterns = [
+    /my name is\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+    /i am\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+    /i'm\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+    /call me\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+    /this is\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+    /name[:\s]+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+    /^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)$/,
+  ];
+  for (var p = 0; p < patterns.length; p++) { var m = text.match(patterns[p]); if (m) { visitor.name = m[1].trim(); break; } }
+}
 
       addMsg("user", text);
       input.value = "";
