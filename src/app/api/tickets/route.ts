@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
-import { tickets } from "@/lib/db/schema";
+import { tickets, conversations } from "@/lib/db/schema";
 
 /** POST /api/tickets — create a support ticket. */
 export async function POST(req: NextRequest) {
