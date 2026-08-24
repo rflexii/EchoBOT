@@ -67,6 +67,7 @@ export const tickets = pgTable("tickets", {
   visitorPhone: text("visitor_phone"),
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
   resolutionNotes: text("resolution_notes"),
+  responses: jsonb("responses").$type<any[]>().default([]),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 }, (t) => ({

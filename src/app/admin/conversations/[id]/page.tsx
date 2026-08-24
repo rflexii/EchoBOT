@@ -15,24 +15,33 @@ export default function ConversationDetailPage({ params }: { params: { id: strin
   }, [params?.id]);
 
   if (error) {
-    return (<div className="py-20 text-center text-sm text-slate-500">{error === "unauthorized" ? <Link href="/admin/login" className="text-brand-600 underline">Sign in</Link> : <div>Conversation not found. <Link href="/admin/conversations" className="text-brand-600 underline">Back</Link></div>}</div>);
+    return (<div className="py-20 text-center text-sm text-slate-500">{error === "unauthorized" ? <Link href="/admin/login" className="text-brand-600 underline">Sign in</Link> : <div>Not found. <Link href="/admin/conversations" className="text-brand-600 underline">Back</Link></div>}</div>);
   }
   if (!data) return <div className="py-20 text-center text-sm text-slate-400">Loading…</div>;
 
   const messages = Array.isArray(data.messages) ? data.messages : [];
-  const visitorName = data.visitorName || "Anonymous";
-  const visitorEmail = data.visitorEmail || "";
 
   function fmtDate(d: any) { try { return new Date(d).toLocaleString("en-NG", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }); } catch { return ""; } }
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link href="/admin/conversations" className="text-xs font-medium text-brand-600 hover:underline">← Back to conversations</Link>
-        <h1 className="mt-2 text-2xl font-bold text-slate-900">
-          {visitorName}{visitorEmail && <span className="text-sm font-normal text-slate-400"> ({visitorEmail})</span>}
-        </h1>
+      <div><Link href="/admin/conversations" className="text-xs font-medium text-brand-600 hover:underline">← Back to conversations</Link></div>
+
+      {/* Contact Info */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-sm font-semibold text-slate-900 mb-3">Visitor Contact Information</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+          <div><span className="text-slate-400 block">Name</span><span className="font-medium">{data.visitorName || "Anonymous"}</span></div>
+          <div><span className="text-slate-400 block">Email</span><span className="font-medium">{data.visitorEmail || "—"}</span></div>
+          <div><span className="text-slate-400 block">Phone</span><span className="font-medium">{data.visitorPhone || "—"}</span></div>
+        </div>
+        <div className="mt-3 flex gap-2">
+          {data.isLead && <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">Lead</span>}
+          {data.escalated && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700">Escalated</span>}
+        </div>
       </div>
+
+      {/* Messages */}
       <div className="space-y-3">
         {messages.length === 0 && <div className="py-10 text-center text-sm text-slate-400">No messages.</div>}
         {messages.map((m: any) => (
