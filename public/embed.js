@@ -1,6 +1,6 @@
 /**
  * Ramat Embeddable Widget — Echo Systems
- * Color: #0c4b2c (green)
+ * Color: #0c4b2c
  */
 (function () {
   function getSelf() {
@@ -14,7 +14,7 @@
   var apiBase = (current && current.getAttribute("data-api")) || "";
   var title = (current && current.getAttribute("data-title")) || "Ramat";
   var greeting = current && current.getAttribute("data-greeting");
-  var visitor = { name: current && current.getAttribute("data-name") || "", email: current && current.getAttribute("data-email") || "", phone: current && current.getAttribute("data-phone") || "" };
+  var visitor = { name: (current && current.getAttribute("data-name")) || "", email: (current && current.getAttribute("data-email")) || "", phone: (current && current.getAttribute("data-phone")) || "" };
   if (!apiBase) { try { apiBase = new URL(current.src).origin; } catch (e) {} }
 
   var GREEN = "#0c4b2c";
@@ -32,7 +32,6 @@
 
     var panel = document.createElement("div");
     panel.style.cssText = "display:none;margin-bottom:16px;width:360px;max-width:calc(100vw - 2rem);max-height:min(640px,calc(100vh - 120px));overflow:hidden;border-radius:16px;border:1px solid #e2e8f0;background:#fff;box-shadow:0 10px 40px -10px rgba(12,75,44,.25);flex-direction:column;font-family:inherit";
-
     root.appendChild(panel);
     root.appendChild(launcher);
 
@@ -56,8 +55,8 @@
       '<div class="ramat-msgs" style="flex:1;overflow-y:auto;background:#f8fafc;padding:16px;display:flex;flex-direction:column;gap:12px;height:min(360px,50vh)"></div>' +
       '<div style="border-top:1px solid #e2e8f0;background:#fff;padding:12px">' +
         '<div style="display:flex;align-items:center;gap:8px;border:1px solid #cbd5e1;border-radius:9999px;background:#f8fafc;padding:8px 16px"><input class="ramat-input" placeholder="Type your message…" style="min-width:0;flex:1;background:transparent;border:none;outline:none;font-size:14px;color:#1e293b;font-family:inherit" />' +
-        '<button class="ramat-send" aria-label="Send" style="width:32px;height:32px;border-radius:50%;background:' + GREEN + ';color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>' +
-        '<div style="margin-top:8px;text-align:center;font-size:10px;color:#94a3b8">Powered by <strong style="color:' + GREEN + '">Echo Systems Network Ltd</strong></div></div>';
+        '<button class="ramat-send" aria-label="Send" style="width:32px;height:32px;border-radius:50%;background:' + GREEN + ";color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"22\" y1=\"2\" x2=\"11\" y2=\"13\"/><polygon points=\"22 2 15 22 11 13 2 9 22 2\"/></svg></button></div>" +
+        '<div style="margin-top:8px;text-align:center;font-size:10px;color:#94a3b8">Powered by Echo Systems Network Ltd</div></div>';
 
     msgsEl = panel.querySelector(".ramat-msgs");
     input = panel.querySelector(".ramat-input");
@@ -82,13 +81,20 @@
     async function send() {
       var text = input.value.trim();
       if (!text) return;
-      // Capture name from first message if not set
-      if (!visitor.name && text.length < 50) {
-        var lower = text.toLowerCase();
-        if (lower.indexOf("my name is") !== -1 || lower.indexOf("i am") !== -1 || lower.indexOf("i'm") !== -1 || lower.split(" ").length <= 4) {
-          visitor.name = text.replace(/my name is|i am|i'm/gi, "").trim();
-        }
+
+      // Capture name from message
+      if (!visitor.name) {
+        var patterns = [
+          /my name is\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+          /i am\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+          /i'm\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+          /call me\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+          /this is\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+          /name[:\s]+([A-Za-z]+(?:\s+[A-Za-z]+)?)/i,
+        ];
+        for (var p = 0; p < patterns.length; p++) { var m = text.match(patterns[p]); if (m) { visitor.name = m[1].trim(); break; } }
       }
+
       addMsg("user", text);
       input.value = "";
       input.disabled = true;
@@ -96,7 +102,7 @@
         var res = await fetch(apiBase + "/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ conversationId: conversationId || undefined, publicId: publicId, message: text, visitor: visitor, escalate: /ticket|human|manager|executive|speak to|someone in charge/i.test(text) }),
+          body: JSON.stringify({ conversationId: conversationId || undefined, publicId: publicId, message: text, visitor: visitor, escalate: /ticket|human|manager|executive|speak to|someone in charge|complaint|complain/i.test(text) }),
         });
         if (!res.ok || !res.body) throw new Error("bad");
         var reader = res.body.getReader();

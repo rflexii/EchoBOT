@@ -73,11 +73,13 @@ export default function AdminTicketsPage() {
             {tickets.map((t) => (
               <tr key={t.id} className="hover:bg-slate-50">
                 <td className="px-5 py-3">
-                  <div className="font-medium text-slate-900">{t.ticketNumber}</div>
+                  <Link href={`/admin/tickets/${t.id}`} className="font-medium text-brand-600 hover:underline">
+                    {t.ticketNumber}
+                  </Link>
                   <div className="max-w-xs truncate text-xs text-slate-400">{t.subject}</div>
                 </td>
                 <td className="px-5 py-3">
-                  <div className="text-slate-900">{t.visitorName || "—"}</div>
+                  <div className="text-slate-900">{t.visitorName || "Anonymous"}</div>
                   <div className="text-xs text-slate-400">{t.visitorEmail || "—"}</div>
                 </td>
                 <td className="px-5 py-3">
