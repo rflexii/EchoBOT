@@ -18,8 +18,8 @@ export async function GET(req: NextRequest) {
   try {
     const status = req.nextUrl.searchParams.get("status");
     const result = status
-      ? await db.execute(sql`SELECT * FROM tickets WHERE status = ${status} ORDER BY created_at DESC LIMIT 100`)
-      : await db.execute(sql`SELECT * FROM tickets ORDER BY created_at DESC LIMIT 100`);
+      ? await db.execute(sql`SELECT id, ticket_number AS "ticketNumber", subject, description, status, priority, visitor_name AS "visitorName", visitor_email AS "visitorEmail", visitor_phone AS "visitorPhone", assigned_to AS "assignedTo", created_at AS "createdAt", updated_at AS "updatedAt" FROM tickets WHERE status = ${status} ORDER BY created_at DESC LIMIT 100`)
+      : await db.execute(sql`SELECT id, ticket_number AS "ticketNumber", subject, description, status, priority, visitor_name AS "visitorName", visitor_email AS "visitorEmail", visitor_phone AS "visitorPhone", assigned_to AS "assignedTo", created_at AS "createdAt", updated_at AS "updatedAt" FROM tickets ORDER BY created_at DESC LIMIT 100`);
     return NextResponse.json({ tickets: result.rows || [] });
   } catch (e: any) { return NextResponse.json({ tickets: [], error: String(e?.message ?? e) }, { status: 200 }); }
 }
@@ -28,7 +28,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
     if (!body.id) return NextResponse.json({ error: "Id required" }, { status: 400 });
-    const [updated] = (await db.execute(sql`UPDATE tickets SET status = ${body.status}, updated_at = NOW() WHERE id = ${body.id} RETURNING *`)).rows;
+    const [updated] = (await db.execute(sql`UPDATE tickets SET status = ${body.status}, updated_at = NOW() WHERE id = ${body.id} RETURNING id, ticket_number AS "ticketNumber", subject, status, priority, visitor_name AS "visitorName", created_at AS "createdAt"`)).rows;
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ ticket: updated });
   } catch (e: any) { return NextResponse.json({ error: String(e?.message ?? e) }, { status: 500 }); }
