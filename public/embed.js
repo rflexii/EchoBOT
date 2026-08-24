@@ -57,7 +57,7 @@
       '<div style="border-top:1px solid #e2e8f0;background:#fff;padding:12px">' +
         '<div style="display:flex;align-items:center;gap:8px;border:1px solid #cbd5e1;border-radius:9999px;background:#f8fafc;padding:8px 16px"><input class="ramat-input" placeholder="Type your message…" style="min-width:0;flex:1;background:transparent;border:none;outline:none;font-size:14px;color:#1e293b;font-family:inherit" />' +
         '<button class="ramat-send" aria-label="Send" style="width:32px;height:32px;border-radius:50%;background:' + GREEN + ';color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>' +
-        '<div style="margin-top:8px;text-align:center;font-size:10px;color:#94a3b8">Powered by <strong style="color:' + GREEN + '">Ramat</strong> · Echo Systems</div></div>';
+        '<div style="margin-top:8px;text-align:center;font-size:10px;color:#94a3b8">Powered by <strong style="color:' + GREEN + '">Echo Systems Network Ltd</strong></div></div>';
 
     msgsEl = panel.querySelector(".ramat-msgs");
     input = panel.querySelector(".ramat-input");

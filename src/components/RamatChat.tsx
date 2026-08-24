@@ -304,7 +304,7 @@ export function RamatChat({
               </button>
             </div>
             <div className="mt-2 text-center text-[10px] text-slate-400">
-              Powered by <span className="font-semibold text-#0c4b2c">Ramat</span> · Echo Systems
+              Powered by <span className="font-semibold text-#0c4b2c">Echo Systems Network Ltd</span>
             </div>
           </div>
         </div>
