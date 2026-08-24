@@ -6,20 +6,6 @@ import { conversations, messages, leads, activityLogs } from "@/lib/db/schema";
 import { publicId } from "@/lib/utils";
 import { buildSystemMessage } from "@/lib/ai";
 
-/**
- * Chat API — handles the full lifecycle of a visitor conversation:
- *   - Creating / resuming conversations
- *   - Persisting user + assistant messages
- *   - Streaming responses from Longcat
- *   - Triggering ticket creation on escalation
- *   - Capturing sales leads
- *
- * Endpoints:
- *   POST /api/chat        -> stream a response (SSE)
- */
-
-// ── Schemas ──────────────────────────────────────────────────────────────────
-
 const chatSchema = z.object({
   conversationId: z.string().optional(),
   publicId: z.string().optional(),
@@ -32,9 +18,7 @@ const chatSchema = z.object({
       page: z.string().optional(),
     })
     .optional(),
-  // When true, the visitor explicitly asked to escalate / open a ticket
   escalate: z.boolean().optional(),
-  // Lead capture payload (optional, sent alongside a message)
   lead: z
     .object({
       name: z.string().optional(),
@@ -48,8 +32,6 @@ const chatSchema = z.object({
     .optional(),
 });
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
 async function getOrCreateConversation(input: z.infer<typeof chatSchema>) {
   if (input.conversationId) {
     const existing = await db.query.conversations.findFirst({
@@ -57,7 +39,6 @@ async function getOrCreateConversation(input: z.infer<typeof chatSchema>) {
     });
     if (existing) return existing;
   }
-
   const created = await db
     .insert(conversations)
     .values({
@@ -68,7 +49,6 @@ async function getOrCreateConversation(input: z.infer<typeof chatSchema>) {
       sourceUrl: input.visitor?.page,
     })
     .returning();
-
   return created[0];
 }
 
@@ -81,15 +61,13 @@ async function appendActivityLog(values: typeof activityLogs.$inferInsert) {
   await db.insert(activityLogs).values(values);
 }
 
-// ── POST /api/chat ───────────────────────────────────────────────────────────
-
 export async function POST(req: NextRequest) {
   try {
     return await handleChat(req);
-  } catch (e) {
+  } catch (e: any) {
     console.error("[api/chat] unhandled error:", e);
     return NextResponse.json(
-      { error: "Internal server error", escalated: true },
+      { error: "Internal server error", message: String(e?.message ?? e), escalated: true },
       { status: 500 }
     );
   }
@@ -105,19 +83,16 @@ async function handleChat(req: NextRequest) {
 
   const conv = await getOrCreateConversation(body);
 
-  // Persist the user message
   await persistMessage({
     conversationId: conv.id,
     role: "user",
     content: body.message,
   });
 
-  // Handle explicit escalation / ticket request
   if (body.escalate) {
     await db.update(conversations).set({ escalated: true }).where(eq(conversations.id, conv.id));
   }
 
-  // Handle optional lead capture
   if (body.lead && (body.lead.email || body.lead.name)) {
     const [lead] = await db
       .insert(leads)
@@ -142,7 +117,6 @@ async function handleChat(req: NextRequest) {
     });
   }
 
-  // Build conversation history for the AI
   const past = await db.query.messages.findMany({
     where: eq(messages.conversationId, conv.id),
     orderBy: (m, { asc }) => asc(m.createdAt),
@@ -160,7 +134,6 @@ async function handleChat(req: NextRequest) {
     page: body.visitor?.page ?? conv.sourceUrl,
   });
 
-  // Stream the AI response
   const client = (await import("@/lib/ai")).getAiClient();
 
   const stream = new ReadableStream({
@@ -182,7 +155,6 @@ async function handleChat(req: NextRequest) {
           controller.enqueue(enc.encode(`data: ${JSON.stringify({ type: "token", content: token })}\n\n`));
         },
         onDone: async (meta) => {
-          // Persist assistant message
           const isEscalation =
             body.escalate ||
             /ticket|escalat|human|manager|executive|speak to|someone in charge/i.test(fullText) ||
@@ -198,10 +170,7 @@ async function handleChat(req: NextRequest) {
             latencyMs: meta.latencyMs,
           });
 
-          await db
-            .update(conversations)
-            .set({ lastMessageAt: new Date() })
-            .where(eq(conversations.id, conv.id));
+          await db.update(conversations).set({ lastMessageAt: new Date() }).where(eq(conversations.id, conv.id));
 
           if (isEscalation) {
             await db.update(conversations).set({ escalated: true }).where(eq(conversations.id, conv.id));
@@ -209,12 +178,7 @@ async function handleChat(req: NextRequest) {
 
           controller.enqueue(
             enc.encode(
-              `data: ${JSON.stringify({
-                type: "done",
-                conversationId: conv.id,
-                escalated: isEscalation,
-                latencyMs: meta.latencyMs,
-              })}\n\n`
+              `data: ${JSON.stringify({ type: "done", conversationId: conv.id, escalated: isEscalation, latencyMs: meta.latencyMs })}\n\n`
             )
           );
           controller.close();
@@ -229,9 +193,7 @@ async function handleChat(req: NextRequest) {
             escalated: true,
           });
           controller.enqueue(
-            enc.encode(
-              `data: ${JSON.stringify({ type: "error", message: "AI generation failed", escalated: true })}\n\n`
-            )
+            enc.encode(`data: ${JSON.stringify({ type: "error", message: "AI generation failed", escalated: true })}\n\n`)
           );
           controller.close();
         },
