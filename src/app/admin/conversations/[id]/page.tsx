@@ -7,15 +7,15 @@ export default function ConversationDetailPage({ params }: { params: { id: strin
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!params?.id) return;
+    if (!params?.id) { setError("not found"); return; }
     fetch(`/api/admin/conversations/${params.id}`)
-      .then((r) => { if (r.status === 401) throw new Error("unauthorized"); if (!r.ok) throw new Error("not found"); return r.json(); })
+      .then(async (r) => { const d = await r.json(); if (!r.ok) throw new Error(d.error || "not found"); return d; })
       .then((d) => { if (!d.conversation) throw new Error("not found"); setData(d.conversation); })
-      .catch((e) => setError(e.message === "unauthorized" ? "unauthorized" : "not found"));
+      .catch((e) => setError(e.message === "not found" ? "not found" : "Failed to load"));
   }, [params?.id]);
 
   if (error) {
-    return (<div className="py-20 text-center text-sm text-slate-500">{error === "unauthorized" ? <Link href="/admin/login" className="text-brand-600 underline">Sign in</Link> : <div>Not found. <Link href="/admin/conversations" className="text-brand-600 underline">Back</Link></div>}</div>);
+    return (<div className="py-20 text-center text-sm text-slate-500">{error === "not found" ? <div>Conversation not found. <Link href="/admin/conversations" className="text-brand-600 underline">Back</Link></div> : error}</div>);
   }
   if (!data) return <div className="py-20 text-center text-sm text-slate-400">Loading…</div>;
 
@@ -26,8 +26,6 @@ export default function ConversationDetailPage({ params }: { params: { id: strin
   return (
     <div className="space-y-6">
       <div><Link href="/admin/conversations" className="text-xs font-medium text-brand-600 hover:underline">← Back to conversations</Link></div>
-
-      {/* Contact Info */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-sm font-semibold text-slate-900 mb-3">Visitor Contact Information</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
@@ -35,20 +33,14 @@ export default function ConversationDetailPage({ params }: { params: { id: strin
           <div><span className="text-slate-400 block">Email</span><span className="font-medium">{data.visitorEmail || "—"}</span></div>
           <div><span className="text-slate-400 block">Phone</span><span className="font-medium">{data.visitorPhone || "—"}</span></div>
         </div>
-        <div className="mt-3 flex gap-2">
-          {data.isLead && <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">Lead</span>}
-          {data.escalated && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700">Escalated</span>}
-        </div>
       </div>
-
-      {/* Messages */}
       <div className="space-y-3">
         {messages.length === 0 && <div className="py-10 text-center text-sm text-slate-400">No messages.</div>}
         {messages.map((m: any) => (
           <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[70%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm ${m.role === "user" ? "rounded-br-sm bg-brand-600 text-white" : "rounded-bl-sm bg-white text-slate-800 shadow-sm"}`}>
               {m.content || ""}
-              <div className={`mt-1 text-[10px] ${m.role === "user" ? "text-white/60" : "text-slate-400"}`}>{fmtDate(m.createdAt)}{m.escalated ? " · escalated" : ""}</div>
+              <div className={`mt-1 text-[10px] ${m.role === "user" ? "text-white/60" : "text-slate-400"}`}>{fmtDate(m.createdAt)}</div>
             </div>
           </div>
         ))}
