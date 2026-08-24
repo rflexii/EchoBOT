@@ -152,7 +152,7 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            conversationId: conversationId,
+            conversationId: conversationId || undefined,
             publicId: publicId,
             message: text,
             visitor: {
