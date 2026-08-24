@@ -238,7 +238,7 @@ export function RamatChat({
                   className={cn(
                     "max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-bubble",
                     m.role === "user"
-                      ? "rounded-br-sm bg-brand-600 text-white"
+                      ? "rounded-br-sm bg-#0c4b2c text-white"
                       : "rounded-bl-sm bg-white text-slate-800"
                   )}
                 >
@@ -295,7 +295,7 @@ export function RamatChat({
                 onClick={send}
                 disabled={loading || !input.trim()}
                 aria-label="Send message"
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white transition hover:bg-brand-700 disabled:opacity-40"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-#0c4b2c text-white transition hover:bg-brand-700 disabled:opacity-40"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="22" y1="2" x2="11" y2="13" />
@@ -304,7 +304,7 @@ export function RamatChat({
               </button>
             </div>
             <div className="mt-2 text-center text-[10px] text-slate-400">
-              Powered by <span className="font-semibold text-brand-600">Ramat</span> · Echo Systems
+              Powered by <span className="font-semibold text-#0c4b2c">Ramat</span> · Echo Systems
             </div>
           </div>
         </div>
@@ -347,7 +347,7 @@ function LeadCaptureInline({ onSubmit }: { onSubmit: (data: any) => Promise<void
         />
         <button
           onClick={() => onSubmit({ name, email }).then(() => setSent(true))}
-          className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700"
+          className="rounded-lg bg-#0c4b2c px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700"
         >
           Send
         </button>
