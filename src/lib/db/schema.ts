@@ -263,3 +263,12 @@ export type NewActivityLog = typeof activityLogs.$inferInsert;
 export type TicketStatus = (typeof ticketStatusEnum.enumValues)[number];
 export type TicketPriority = (typeof ticketPriorityEnum.enumValues)[number];
 export type LeadStatus = (typeof leadStatusEnum.enumValues)[number];
+
+// ── Admins ──────────────────────────────────────────────────────────────────
+export const admins = pgTable("admins", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").notNull(),
+  name: text("name"),
+  passwordHash: text("password_hash").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => ({ emailIdx: uniqueIndex("admins_email_idx").on(t.email) }));
