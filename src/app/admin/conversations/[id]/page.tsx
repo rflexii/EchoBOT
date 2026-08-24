@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatDateTime } from "@/lib/utils";
@@ -29,11 +28,7 @@ export default function ConversationDetailPage({ params }: { params: Promise<{ i
   }, [id]);
 
   if (error) {
-    return (
-      <div className="py-20 text-center text-sm text-slate-500">
-        {error === "unauthorized" ? <Link href="/admin/login" className="text-brand-600 underline">Sign in</Link> : error}
-      </div>
-    );
+    return (<div className="py-20 text-center text-sm text-slate-500">{error === "unauthorized" ? <Link href="/admin/login" className="text-brand-600 underline">Sign in</Link> : error}</div>);
   }
   if (!data) return <div className="py-20 text-center text-sm text-slate-400">Loading…</div>;
 
