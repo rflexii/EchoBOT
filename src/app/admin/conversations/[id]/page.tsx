@@ -8,6 +8,11 @@ interface Conversation {
   id: string;
   visitorName: string | null;
   visitorEmail: string | null;
+  visitorPhone: string | null;
+  sourceUrl: string | null;
+  isLead: boolean;
+  escalated: boolean;
+  startedAt: string;
   messages: { id: string; role: string; content: string; createdAt: string; escalated: boolean }[];
   tickets: { id: string; ticketNumber: string; subject: string; status: string }[];
   leads: { id: string; name: string | null; email: string | null; status: string }[];
@@ -24,22 +29,43 @@ export default function ConversationDetailPage({ params }: { params: Promise<{ i
 
   useEffect(() => {
     if (!id) return;
+    setError(null);
     fetch(`/api/admin/conversations/${id}`)
       .then((r) => {
         if (r.status === 401) throw new Error("unauthorized");
+        if (r.status === 404) throw new Error("not found");
         return r.json();
       })
-      .then((d) => setData(d.conversation))
-      .catch((e) => setError(e.message === "unauthorized" ? "unauthorized" : "Failed to load"));
+      .then((d) => {
+        if (!d.conversation) throw new Error("not found");
+        setData(d.conversation);
+      })
+      .catch((e) =>
+        setError(e.message === "unauthorized" ? "unauthorized" : e.message === "not found" ? "not found" : "Failed to load")
+      );
   }, [id]);
 
   if (error) {
     return (
       <div className="py-20 text-center text-sm text-slate-500">
-        {error === "unauthorized" ? <Link href="/admin/login" className="text-brand-600 underline">Sign in</Link> : error}
+        {error === "unauthorized" ? (
+          <Link href="/admin/login" className="text-brand-600 underline">
+            Sign in
+          </Link>
+        ) : error === "not found" ? (
+          <div>
+            Conversation not found.{" "}
+            <Link href="/admin/conversations" className="text-brand-600 underline">
+              Back to conversations
+            </Link>
+          </div>
+        ) : (
+          error
+        )}
       </div>
     );
   }
+
   if (!data) return <div className="py-20 text-center text-sm text-slate-400">Loading…</div>;
 
   return (
@@ -49,12 +75,24 @@ export default function ConversationDetailPage({ params }: { params: Promise<{ i
           ← Back to conversations
         </Link>
         <h1 className="mt-2 text-2xl font-bold text-slate-900">
-          {data.visitorName || "Anonymous"} {data.visitorEmail && <span className="text-sm font-normal text-slate-400">({data.visitorEmail})</span>}
+          {data.visitorName || "Anonymous"}{" "}
+          {data.visitorEmail && <span className="text-sm font-normal text-slate-400">({data.visitorEmail})</span>}
         </h1>
+        <div className="mt-1 flex flex-wrap gap-2 text-xs text-slate-500">
+          {data.visitorPhone && <span>📞 {data.visitorPhone}</span>}
+          {data.sourceUrl && (
+            <span className="truncate max-w-xs" title={data.sourceUrl}>
+              🔗 {data.sourceUrl}
+            </span>
+          )}
+          <span>Started {formatDateTime(data.startedAt)}</span>
+          {data.isLead && <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-700">Lead</span>}
+          {data.escalated && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-700">Escalated</span>}
+        </div>
       </div>
 
       {(data.tickets.length > 0 || data.leads.length > 0) && (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {data.tickets.map((t) => (
             <span key={t.id} className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700">
               Ticket {t.ticketNumber} · {t.status}
@@ -69,11 +107,16 @@ export default function ConversationDetailPage({ params }: { params: Promise<{ i
       )}
 
       <div className="space-y-3">
+        {data.messages.length === 0 && (
+          <div className="py-10 text-center text-sm text-slate-400">No messages in this conversation.</div>
+        )}
         {data.messages.map((m) => (
           <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
               className={`max-w-[70%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm ${
-                m.role === "user" ? "rounded-br-sm bg-brand-600 text-white" : "rounded-bl-sm bg-white text-slate-800 shadow-sm"
+                m.role === "user"
+                  ? "rounded-br-sm bg-brand-600 text-white"
+                  : "rounded-bl-sm bg-white text-slate-800 shadow-sm"
               }`}
             >
               {m.content}
