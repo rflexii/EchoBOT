@@ -2,6 +2,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+const STATUS_COLORS: Record<string, string> = {
+  open: "bg-amber-100 text-amber-700",
+  in_progress: "bg-blue-100 text-blue-700",
+  resolved: "bg-emerald-100 text-emerald-700",
+  closed: "bg-slate-100 text-slate-600",
+};
+
 export default function AdminTicketsPage() {
   const [tickets, setTickets] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +39,7 @@ export default function AdminTicketsPage() {
               <tr key={t.id} className="hover:bg-slate-50">
                 <td className="px-5 py-3"><Link href={`/admin/tickets/${t.id}`} className="font-medium text-brand-600 hover:underline">{t.ticketNumber || "Unknown"}</Link><div className="text-xs text-slate-400 truncate max-w-xs">{t.subject || ""}</div></td>
                 <td className="px-5 py-3"><div className="text-slate-900">{t.visitorName || "Anonymous"}</div><div className="text-xs text-slate-400">{t.visitorEmail || "—"}</div></td>
-                <td className="px-5 py-3"><span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 capitalize">{t.status || "open"}</span></td>
+                <td className="px-5 py-3"><span className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${STATUS_COLORS[t.status] || "bg-slate-100 text-slate-600"}`}>{t.status?.replace("_", " ") || "open"}</span></td>
                 <td className="px-5 py-3 text-xs text-slate-500">{fmtDate(t.createdAt)}</td>
               </tr>
             ))}

@@ -1,22 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { eq } from "drizzle-orm";
-import { tickets } from "@/lib/db/schema";
-import { requireAdmin } from "@/lib/admin";
+import { sql } from "drizzle-orm";
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const admin = await requireAdmin(req); if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { id } = await params;
-  const ticket = await db.query.tickets.findFirst({ where: eq(tickets.id, id) });
-  if (!ticket) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json({ ticket });
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const { id } = await params;
+    if (!id) return NextResponse.json({ error: "Id required" }, { status: 400 });
+    const result = await db.execute(sql`SELECT id, ticket_number AS "ticketNumber", subject, description, status, priority, visitor_name AS "visitorName", visitor_email AS "visitorEmail", visitor_phone AS "visitorPhone", assigned_to AS "assignedTo", responses, created_at AS "createdAt", updated_at AS "updatedAt" FROM tickets WHERE id = ${id}`);
+    if (!result.rows.length) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ ticket: result.rows[0] });
+  } catch (e: any) { return NextResponse.json({ error: String(e?.message ?? e) }, { status: 500 }); }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const admin = await requireAdmin(req); if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { id } = await params;
-  const body = await req.json();
-  const [updated] = await db.update(tickets).set({ ...body, updatedAt: new Date() }).where(eq(tickets.id, id)).returning();
-  if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json({ ticket: updated });
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const { id } = await params;
+    const body = await req.json();
+    if (!id) return NextResponse.json({ error: "Id required" }, { status: 400 });
+    const [updated] = (await db.execute(sql`UPDATE tickets SET status = ${body.status || "open"}, updated_at = NOW() WHERE id = ${id} RETURNING id, ticket_number AS "ticketNumber", subject, status, priority, visitor_name AS "visitorName", created_at AS "createdAt"`)).rows;
+    if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ ticket: updated });
+  } catch (e: any) { return NextResponse.json({ error: String(e?.message ?? e) }, { status: 500 }); }
 }
