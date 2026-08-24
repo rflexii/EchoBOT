@@ -146,6 +146,22 @@ export const tickets = pgTable(
   })
 );
 
+// ── Admins (Dashboard Users) ─────────────────────────────────────────────────
+
+export const admins = pgTable(
+  "admins",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: text("email").notNull(),
+    name: text("name"),
+    passwordHash: text("password_hash").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => ({
+    emailIdx: uniqueIndex("admins_email_idx").on(t.email),
+  })
+);
+
 // ── Leads (Sales Pipeline) ───────────────────────────────────────────────────
 
 export const leads = pgTable(
