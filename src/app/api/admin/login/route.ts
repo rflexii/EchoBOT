@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { db } from "@/lib/db";
-import { eq } from "drizzle-orm";
-import { admins } from "@/lib/db/schema";
 import { AUTH_COOKIE } from "@/lib/auth";
-import { verifyPassword } from "@/lib/email";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -19,25 +15,33 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  // Check database admins first
-  const dbAdmin = await db.query.admins.findFirst({ where: eq(admins.email, body.email) });
-  if (dbAdmin) {
-    const valid = await verifyPassword(body.password, dbAdmin.passwordHash);
-    if (!valid) return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-    return setSession(body.email);
-  }
-
-  // Fall back to env-based admins
+  // Check env-based admins (always works)
   const envAdmins = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
   if (envAdmins.includes(body.email.toLowerCase())) {
     try {
-      const { verifyPassword: envVerify } = await import("@/lib/auth");
-      const valid = await envVerify(body.email, body.password);
+      const { verifyPassword } = await import("@/lib/auth");
+      const valid = await verifyPassword(body.email, body.password);
       if (!valid) return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
       return setSession(body.email);
     } catch {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
+  }
+
+  // Check database admins (only if table exists)
+  try {
+    const { db } = await import("@/lib/db");
+    const { eq } = await import("drizzle-orm");
+    const { admins } = await import("@/lib/db/schema");
+    const { verifyPassword } = await import("@/lib/email");
+    const dbAdmin = await db.query.admins.findFirst({ where: eq(admins.email, body.email) });
+    if (dbAdmin) {
+      const valid = await verifyPassword(body.password, dbAdmin.passwordHash);
+      if (!valid) return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      return setSession(body.email);
+    }
+  } catch {
+    // admins table may not exist yet, ignore
   }
 
   return NextResponse.json({ error: "Not authorized" }, { status: 403 });
