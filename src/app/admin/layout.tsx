@@ -18,12 +18,17 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const [authed, setAuthed] = useState(false);
   const [ready, setReady] = useState(false);
 
+  const isLoginPage = pathname === "/admin/login";
+
   useEffect(() => {
+    if (isLoginPage) { setReady(true); return; }
     fetch("/api/admin/session").then((r) => { if (r.ok) setAuthed(true); setReady(true); }).catch(() => setReady(true));
-  }, []);
+  }, [isLoginPage]);
 
   if (!ready) return <div className="flex min-h-screen items-center justify-center text-sm text-slate-400">Loading…</div>;
-  if (!authed) return <div className="flex min-h-screen items-center justify-center text-sm text-slate-500"><Link href="/admin/login" className="text-brand-600 underline">Sign in</Link></div>;
+  if (!isLoginPage && !authed) return <div className="flex min-h-screen items-center justify-center text-sm text-slate-500"><Link href="/admin/login" className="text-brand-600 underline">Sign in</Link></div>;
+
+  if (isLoginPage) return <>{children}</>;
 
   async function logout() { await fetch("/api/admin/logout", { method: "POST" }); router.push("/admin/login"); router.refresh(); }
 
