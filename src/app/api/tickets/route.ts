@@ -3,15 +3,12 @@ import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { tickets, conversations } from "@/lib/db/schema";
 
-/** POST /api/tickets — create a support ticket. */
 export async function POST(req: NextRequest) {
   try {
     let body: any;
     try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid request" }, { status: 400 }); }
-
     const conv = await db.query.conversations.findFirst({ where: eq(conversations.id, body.conversationId) });
     if (!conv) return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
-
     const [ticket] = await db.insert(tickets).values({
       ticketNumber: new Date().getFullYear() + "-" + Math.floor(10000 + Math.random() * 90000),
       conversationId: conv.id,
@@ -23,13 +20,11 @@ export async function POST(req: NextRequest) {
       visitorEmail: body.visitor?.email ?? conv.visitorEmail,
       visitorPhone: body.visitor?.phone ?? conv.visitorPhone,
     }).returning();
-
     await db.update(conversations).set({ escalated: true }).where(eq(conversations.id, conv.id));
     return NextResponse.json({ ticket });
   } catch (e: any) { return NextResponse.json({ error: String(e?.message ?? e) }, { status: 500 }); }
 }
 
-/** GET /api/tickets — list tickets. */
 export async function GET(req: NextRequest) {
   try {
     const status = req.nextUrl.searchParams.get("status");
@@ -38,11 +33,10 @@ export async function GET(req: NextRequest) {
       orderBy: (t: any, { desc }: any) => desc(t.createdAt),
       limit: 100,
     });
-    return NextResponse.json({ tickets: all });
-  } catch (e: any) { return NextResponse.json({ error: String(e?.message ?? e) }, { status: 500 }); }
+    return NextResponse.json({ tickets: all || [] });
+  } catch (e: any) { return NextResponse.json({ tickets: [], error: String(e?.message ?? e) }, { status: 200 }); }
 }
 
-/** PATCH /api/tickets — update ticket. */
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();

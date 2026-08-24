@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { conversations, messages, leads, tickets, activityLogs } from "@/lib/db/schema";
+import { conversations, messages, leads } from "@/lib/db/schema";
 import { publicId } from "@/lib/utils";
 import { buildSystemMessage } from "@/lib/ai";
 
@@ -29,8 +29,6 @@ async function handleChat(req: NextRequest) {
   if (body.visitor?.name && body.visitor.name !== conv.visitorName) {
     await db.update(conversations).set({ visitorName: body.visitor.name, visitorEmail: body.visitor.email ?? conv.visitorEmail, visitorPhone: body.visitor.phone ?? conv.visitorPhone }).where(eq(conversations.id, conv.id));
     conv.visitorName = body.visitor.name;
-    try { await db.update(tickets).set({ visitorName: body.visitor.name }).where(eq(tickets.conversationId, conv.id)); } catch {}
-    try { await db.update(leads).set({ name: body.visitor.name }).where(eq(leads.conversationId, conv.id)); } catch {}
   }
 
   if (!conv.visitorName) {
@@ -51,16 +49,17 @@ async function handleChat(req: NextRequest) {
     await db.update(conversations).set({ isLead: true }).where(eq(conversations.id, conv.id));
   }
 
+  // Ticket creation - wrapped so it never breaks chat
   var wantsEscalation = body.escalate || /ticket|human|manager|executive|speak to|someone in charge|complaint|complain/i.test(body.message);
   if (wantsEscalation) {
-    var existingTicket = await db.query.tickets.findFirst({ where: eq(tickets.conversationId, conv.id) });
-    if (!existingTicket) {
-      try {
-        var [ticket] = await db.insert(tickets).values({ ticketNumber: new Date().getFullYear() + "-" + Math.floor(10000 + Math.random() * 90000), conversationId: conv.id, subject: body.message.slice(0, 100), description: body.message, priority: "medium", visitorName: conv.visitorName, visitorEmail: conv.visitorEmail, visitorPhone: conv.visitorPhone }).returning();
+    try {
+      const { tickets } = await import("@/lib/db/schema");
+      const existingTicket = await db.query.tickets.findFirst({ where: eq(tickets.conversationId, conv.id) });
+      if (!existingTicket) {
+        const [ticket] = await db.insert(tickets).values({ ticketNumber: new Date().getFullYear() + "-" + Math.floor(10000 + Math.random() * 90000), conversationId: conv.id, subject: body.message.slice(0, 100), description: body.message, priority: "medium", visitorName: conv.visitorName, visitorEmail: conv.visitorEmail, visitorPhone: conv.visitorPhone }).returning();
         await db.update(conversations).set({ escalated: true }).where(eq(conversations.id, conv.id));
-        await db.insert(activityLogs).values({ actor: conv.visitorEmail ?? "visitor", action: "ticket.created", entityType: "ticket", entityId: ticket.id, details: { ticketNumber: ticket.ticketNumber } });
-      } catch (e) { console.error("Ticket creation failed:", e); }
-    }
+      }
+    } catch (e) { console.error("Ticket creation failed:", e); }
   }
 
   var past = await db.query.messages.findMany({ where: eq(messages.conversationId, conv.id), orderBy: (m: any, { asc }: any) => asc(m.createdAt), limit: 50 });
